@@ -443,6 +443,7 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest, bool fCountFailure
 
         pnode->nServicesExpected = ServiceFlags(addrConnect.nServices & nRelevantServices);
         pnode->nTimeConnected = GetTime();
+        pnode->fWhitelisted = CNode::IsWhitelistedRange((CNetAddr)addrConnect);
 
         return pnode;
     } else if (!proxyConnectionFailed) {
