@@ -255,6 +255,7 @@ extern UniValue getdifficulty(const UniValue& params, bool fHelp);
 extern UniValue settxfee(const UniValue& params, bool fHelp);
 extern UniValue getmempoolinfo(const UniValue& params, bool fHelp);
 extern UniValue getrawmempool(const UniValue& params, bool fHelp);
+extern UniValue evictfrommempool(const UniValue& params, bool fHelp);
 extern UniValue getblockhash(const UniValue& params, bool fHelp);
 extern UniValue getblockheader(const UniValue& params, bool fHelp);
 extern UniValue getblock(const UniValue& params, bool fHelp);
