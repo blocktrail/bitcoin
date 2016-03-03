@@ -459,6 +459,40 @@ UniValue getmempoolentry(const UniValue& params, bool fHelp)
     return info;
 }
 
+UniValue evictfrommempool(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+                "evictfrommempool \"txid\"\n"
+                        "Evict transaction <txid> from mempool\n"
+                        "\nArguments:\n"
+                        "1. \"txid\"    (string, required) The transaction id\n"
+                        "\nResult:\n"
+                        "\nExamples:\n"
+                + HelpExampleCli("evictfrommempool", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\"")
+                + HelpExampleRpc("evictfrommempool", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\"")
+        );
+
+    uint256 hash = ParseHashV(params[0], "parameter 1");
+
+    LOCK(mempool.cs);
+
+    // ensure the TX is in mempool
+    CTxMemPool::txiter it = mempool.mapTx.find(hash);
+    if (it == mempool.mapTx.end()) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Transaction not in mempool");
+    }
+
+    // calculate descendants
+    CTxMemPool::setEntries setDescendants;
+    mempool.CalculateDescendants(it, setDescendants);
+
+    // remove the TX and it's descendants
+    mempool.RemoveStaged(setDescendants, false);
+
+    return NullUniValue;
+}
+
 UniValue getblockhash(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
@@ -1200,6 +1234,7 @@ static const CRPCCommand commands[] =
     { "blockchain",         "getmempoolentry",        &getmempoolentry,        true  },
     { "blockchain",         "getmempoolinfo",         &getmempoolinfo,         true  },
     { "blockchain",         "getrawmempool",          &getrawmempool,          true  },
+    { "blockchain",         "evictfrommempool",       &evictfrommempool,       true  },
     { "blockchain",         "gettxout",               &gettxout,               true  },
     { "blockchain",         "gettxoutsetinfo",        &gettxoutsetinfo,        true  },
     { "blockchain",         "verifychain",            &verifychain,            true  },
