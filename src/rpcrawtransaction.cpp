@@ -825,12 +825,12 @@ UniValue sendrawtransaction(const UniValue& params, bool fHelp)
         bool fMissingInputs;
         if (!AcceptToMemoryPool(mempool, state, tx, false, &fMissingInputs, false, !fOverrideFees)) {
             if (state.IsInvalid()) {
-                throw JSONRPCError(RPC_TRANSACTION_REJECTED, strprintf("%i: %s", state.GetRejectCode(), state.GetRejectReason()));
+                throw JSONRPCError(RPC_TRANSACTION_REJECTED, strprintf("%i: %s (%s)", state.GetRejectCode(), state.GetRejectReason(), state.GetDebugMessage()));
             } else {
                 if (fMissingInputs) {
                     throw JSONRPCError(RPC_TRANSACTION_ERROR, "Missing inputs");
                 }
-                throw JSONRPCError(RPC_TRANSACTION_ERROR, state.GetRejectReason());
+                throw JSONRPCError(RPC_TRANSACTION_ERROR, strprintf("%i: %s (%s)", state.GetRejectCode(), state.GetRejectReason(), state.GetDebugMessage()));
             }
         }
     } else if (fHaveChain) {
